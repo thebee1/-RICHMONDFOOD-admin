@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RICHMOND FOOD — Administration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #F5F1E8; color: #1E2B22; min-height: 100vh;
+}
+:root {
+  --bg: #F5F1E8;
+  --card: #FFFFFF;
+  --dark: #1E2B22;
+  --green: #2E5B3F;
+  --gold: #C89B3C;
+  --gold-light: #E8D5A8;
+  --line: #E7E0D2;
+  --gray: #7A7A72;
+  --red: #B0442B;
+  --blue: #3D5A6C;
+  --shadow: 0 2px 12px rgba(30,43,34,0.06);
+  --shadow-lg: 0 12px 30px rgba(30,43,34,0.15);
+}
+
+/* LOGIN */
+#loginScreen {
+  display: grid; place-items: center;
+  min-height: 100vh; padding: 24px;
+  background: linear-gradient(135deg, #1E2B22, #2E5B3F);
+}
+#loginScreen .card {
+  width: min(100%, 420px); padding: 40px 32px; background: #fff;
+  border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  border-top: 4px solid var(--gold);
+}
+#loginScreen .logo {
+  text-align: center; font-size: 1.8rem; font-weight: 800;
+  letter-spacing: 3px; margin-bottom: 6px;
+}
+#loginScreen .logo span { color: var(--gold); }
+#loginScreen .sub { text-align: center; color: var(--gray); font-size: 0.9rem; margin-bottom: 30px; }
+#loginScreen h1 { font-size: 1.3rem; margin-bottom: 20px; font-weight: 700; }
+#loginScreen label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.88rem; }
+#loginScreen input {
+  width: 100%; min-height: 46px; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 8px;
+  font-family: inherit; font-size: 0.95rem; margin-bottom: 14px;
+}
+#loginScreen input:focus { outline: 2px solid #C89B3C66; border-color: var(--gold); }
+#loginScreen button {
+  width: 100%; min-height: 48px; background: var(--green); color: #fff;
+  border: none; border-radius: 8px; font-weight: 700; font-size: 1rem;
+  cursor: pointer; font-family: inherit;
+}
+#loginScreen button:hover { background: var(--dark); }
+#loginScreen .msg {
+  display: none; margin-top: 14px; padding: 12px; border-radius: 8px;
+  font-size: 0.88rem;
+}
+#loginScreen .msg.error { display: block; background: #FCEAE7; color: var(--red); }
+#loginScreen .msg.success { display: block; background: #EAF3EC; color: var(--green); }
+#loginScreen .hint {
+  margin-top: 20px; text-align: center;
+  font-size: 0.78rem; color: var(--gray);
+}
+
+/* APP LAYOUT */
+#appScreen { display: none; }
+#appScreen.active { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px; background: var(--dark); color: #fff;
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.sidebar .brand {
+  padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 1.1rem; font-weight: 800; letter-spacing: 2px;
+}
+.sidebar .brand span { color: var(--gold); }
+.sidebar .brand-sub {
+  font-size: 0.68rem; color: var(--gold-light);
+  letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+  margin-top: 2px;
+}
+.sidebar nav { flex: 1; padding: 12px 0; }
+.sidebar .nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+.sidebar .nav-item:hover {
+  background: rgba(255,255,255,0.05); color: #fff;
+}
+.sidebar .nav-item.active {
+  background: rgba(200,155,60,0.12);
+  color: var(--gold-light);
+  border-left-color: var(--gold);
+}
+.sidebar .nav-item .icon { font-size: 1.15rem; width: 22px; text-align: center; }
+.sidebar .nav-item .badge {
+  margin-left: auto; background: var(--red); color: #fff;
+  font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; font-weight: 700;
+}
+.sidebar .footer {
+  padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.82rem; color: rgba(255,255,255,0.5);
+}
+.sidebar .footer strong { color: var(--gold-light); display: block; margin-bottom: 6px; }
+.sidebar .logout {
+  width: 100%; padding: 8px 12px; margin-top: 10px;
+  background: transparent; color: var(--gold);
+  border: 1px solid var(--gold); border-radius: 6px;
+  font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+}
+.sidebar .logout:hover { background: var(--gold); color: var(--dark); }
+
+/* MAIN */
+.main { flex: 1; overflow-x: hidden; }
+.topbar {
+  background: var(--card); border-bottom: 1px solid var(--line);
+  padding: 18px 30px; display: flex; justify-content: space-between;
+  align-items: center; position: sticky; top: 0; z-index: 10;
+}
+.topbar h1 { font-size: 1.5rem; font-weight: 700; }
+.topbar .actions { display: flex; gap: 10px; align-items: center; }
+.topbar .date {
+  color: var(--gray); font-size: 0.85rem; margin-right: 10px;
+}
+.btn {
+  padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card); color: var(--dark);
+  font-family: inherit; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn:hover { border-color: var(--gold); background: #FCF5E3; }
+.btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-primary:hover { background: var(--dark); border-color: var(--dark); color: var(--gold-light); }
+.btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+.content { padding: 30px; }
+
+/* STAT CARDS */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px; margin-bottom: 30px;
+}
+.stat {
+  background: var(--card); border-radius: 12px; padding: 22px;
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+  border-top: 3px solid var(--green);
+}
+.stat.gold { border-top-color: var(--gold); }
+.stat.blue { border-top-color: var(--blue); }
+.stat.red { border-top-color: var(--red); }
+.stat .label {
+  font-size: 0.78rem; color: var(--gray); text-transform: uppercase;
+  letter-spacing: 1px; font-weight: 700; margin-bottom: 8px;
+}
+.stat .value { font-size: 2rem; font-weight: 800; color: var(--dark); }
+.stat .sub { font-size: 0.8rem; color: var(--gray); margin-top: 6px; }
+
+/* TOOLBAR */
+.toolbar {
+  background: var(--card); padding: 16px 20px; border-radius: 12px;
+  border: 1px solid var(--line); margin-bottom: 20px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+.toolbar input, .toolbar select {
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px;
+  font-family: inherit; font-size: 0.9rem; min-height: 40px;
+}
+.toolbar input { flex: 1 1 240px; }
+.toolbar select { cursor: pointer; }
+.toolbar .count {
+  margin-left: auto; color: var(--gray); font-size: 0.85rem; font-weight: 600;
+}
+
+/* TABLE */
+.table-wrap {
+  background: var(--card); border-radius: 12px;
+  border: 1px solid var(--line); overflow: hidden;
+  box-shadow: var(--shadow);
+}
+table { width: 100%; border-collapse: collapse; }
+thead {
+  background: #FAF7F0;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  padding: 14px 16px; text-align: left;
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--gray); text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+td { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 0.9rem; }
+tr:hover td { background: #FAF7F0; }
+.state-badge {
+  display: inline-block; padding: 4px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 700;
+}
+.state-pending { background: #F7E9E5; color: var(--red); }
+.state-preparing { background: #FCF5E3; color: #8A6D1F; }
+.state-ready { background: #EAF3EC; color: var(--green); }
+.state-delivering { background: #E8EEF2; color: var(--blue); }
+.state-delivered { background: #E5EFE8; color: #1E5B3F; }
+.state-cancelled { background: #EDE8E5; color: var(--gray); }
+.source-badge {
+  font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; font-weight: 700;
+  text-transform: uppercase;
+}
+.source-website { background: #E8EEF2; color: var(--blue); }
+.source-whatsapp { background: #EAF3EC; color: var(--green); }
+
+.row-actions { display: flex; gap: 6px; }
+.row-actions button {
+  padding: 5px 10px; font-size: 0.75rem; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--card);
+  cursor: pointer; font-family: inherit; font-weight: 600;
+}
+.row-actions button:hover { border-color: var(--gold); background: #FCF5E3; }
+.row-actions .danger:hover { border-color: var(--red); background: #FCEAE7; color: var(--red); }
+
+.empty {
+  padding: 60px 20px; text-align: center; color: var(--gray);
+}
+.empty-icon { font-size: 3.5rem; opacity: 0.3; margin-bottom: 14px; }
+.empty p { font-size: 0.95rem; }
+
+/* DETAIL PANEL */
+.detail-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(30,43,34,0.6); z-index: 1000;
+}
+.detail-overlay.active { display: block; }
+.detail-panel {
+  position: fixed; top: 0; right: -520px; width: 520px; height: 100vh;
+  background: var(--bg); box-shadow: -10px 0 40px rgba(0,0,0,0.25);
+  z-index: 1001; transition: right 0.35s cubic-bezier(0.22,1,0.36,1);
+  display: flex; flex-direction: column;
+}
+.detail-panel.active { right: 0; }
+.detail-header {
+  padding: 22px 26px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--card);
+}
+.detail-header h2 { font-size: 1.2rem; font-weight: 700; }
+.detail-close {
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: transparent; font-size: 1.3rem; cursor: pointer;
+  color: var(--gray);
+}
+.detail-close:hover { background: var(--line); color: var(--dark); }
+.detail-body { flex: 1; overflow-y: auto; padding: 26px; }
+.detail-section { margin-bottom: 24px; }
+.detail-section h3 {
+  font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--gray); font-weight: 700;
+  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+.detail-row {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  font-size: 0.9rem; border-bottom: 1px dashed var(--line);
+}
+.detail-row strong { font-weight: 600; }
+.detail-row span:last-child { text-align: right; color: var(--dark); font-weight: 500; }
+.item-line {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  font-size: 0.88rem; border-bottom: 1px solid var(--line);
+}
+.item-line .qty {
+  display: inline-block; background: var(--green); color: #fff;
+  padding: 1px 8px; border-radius: 6px;
+  font-size: 0.72rem; font-weight: 700; margin-right: 8px;
+}
+
+/* USERS */
+.user-card {
+  background: var(--card); padding: 18px; border-radius: 12px;
+  border: 1px solid var(--line); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 14px;
+}
+.user-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--green); color: var(--gold-light);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.1rem;
+}
+.user-info { flex: 1; }
+.user-info .name { font-weight: 700; font-size: 0.95rem; }
+.user-info .meta { font-size: 0.82rem; color: var(--gray); margin-top: 3px; }
+.role-badge {
+  padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase;
+}
+.role-client { background: #EAF3EC; color: var(--green); }
+.role-cook { background: #FCF5E3; color: #8A6D1F; }
+.role-driver { background: #E8EEF2; color: var(--blue); }
+
+/* WHATSAPP SEND */
+.wa-card {
+  background: var(--card); padding: 22px; border-radius: 12px;
+  border: 1px solid var(--line); margin-bottom: 20px;
+}
+.wa-card h3 { margin-bottom: 14px; font-size: 1rem; font-weight: 700; }
+.wa-card textarea {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: 8px; font-family: inherit; font-size: 0.9rem;
+  min-height: 130px; resize: vertical;
+}
+.wa-card input {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: 8px; font-family: inherit; font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+.wa-card label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; }
+.wa-card .btn-primary { margin-top: 12px; width: 100%; }
+
+/* SETTINGS */
+.settings-section {
+  background: var(--card); padding: 22px; border-radius: 12px;
+  border: 1px solid var(--line); margin-bottom: 20px;
+}
+.settings-section h3 {
+  margin-bottom: 16px; font-size: 1rem; font-weight: 700;
+  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+}
+.settings-section label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; }
+.settings-section input {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--line);
+  border-radius: 8px; font-family: inherit; margin-bottom: 14px;
+}
+.settings-section small { color: var(--gray); font-size: 0.78rem; display: block; margin-top: -10px; margin-bottom: 14px; }
+
+/* LOADING */
+.loading-zone {
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px; color: var(--gray);
+}
+.loading-spinner {
+  width: 34px; height: 34px; border: 3px solid var(--line);
+  border-top-color: var(--gold); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--dark); color: #fff;
+  padding: 14px 26px; border-radius: 10px;
+  font-weight: 600; font-size: 0.9rem; z-index: 2000;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  border-left: 4px solid var(--gold);
+  opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.success { background: var(--green); }
+#toast.error { background: var(--red); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { position: fixed; left: -240px; z-index: 100; height: 100vh; transition: left 0.3s; }
+  .sidebar.open { left: 0; }
+  .detail-panel { width: 100%; right: -100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- LOGIN SCREEN                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="card">
+    <div class="logo">RICHMOND<span>FOOD</span></div>
+    <div class="sub">Espace Administrateur</div>
+    <h1>Connexion</h1>
+    <form id="loginForm">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" required autocomplete="email" placeholder="admin@richmond.ci">
+      <label for="loginPassword">Mot de passe</label>
+      <input id="loginPassword" type="password" required autocomplete="current-password" minlength="6" placeholder="••••••••">
+      <button type="submit" id="loginBtn">Se connecter</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+    <p class="hint">🔒 Accès réservé aux administrateurs</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- APP SCREEN                                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="appScreen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      RICHMOND<span>FOOD</span>
+      <div class="brand-sub">Administration</div>
+    </div>
+    <nav>
+      <div class="nav-item active" data-view="dashboard">
+        <span class="icon">📊</span> Tableau de bord
+      </div>
+      <div class="nav-item" data-view="orders">
+        <span class="icon">📋</span> Commandes
+        <span class="badge" id="navOrdersBadge" style="display:none">0</span>
+      </div>
+      <div class="nav-item" data-view="kitchen">
+        <span class="icon">👨‍🍳</span> Cuisine
+      </div>
+      <div class="nav-item" data-view="drivers">
+        <span class="icon">🛵</span> Livraisons
+      </div>
+      <div class="nav-item" data-view="users">
+        <span class="icon">👥</span> Utilisateurs
+      </div>
+      <div class="nav-item" data-view="messages">
+        <span class="icon">💬</span> WhatsApp
+      </div>
+      <div class="nav-item" data-view="settings">
+        <span class="icon">⚙️</span> Paramètres
+      </div>
+    </nav>
+    <div class="footer">
+      <strong id="userName">Admin</strong>
+      <span id="userEmail">—</span>
+      <button class="logout" onclick="logout()">Se déconnecter</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <h1 id="viewTitle">Tableau de bord</h1>
+      <div class="actions">
+        <span class="date" id="topbarDate">—</span>
+        <button class="btn btn-primary" onclick="refreshAll()">🔄 Actualiser</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="view" data-view-content="dashboard">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat gold">
+            <div class="label">Chiffre d'affaires du jour</div>
+            <div class="value" id="statRevenue">0 F</div>
+            <div class="sub" id="statRevenueSub">0 commandes livrées</div>
+          </div>
+          <div class="stat">
+            <div class="label">Commandes actives</div>
+            <div class="value" id="statActive">0</div>
+            <div class="sub" id="statActiveSub">En cours de traitement</div>
+          </div>
+          <div class="stat blue">
+            <div class="label">Total commandes</div>
+            <div class="value" id="statTotal">0</div>
+            <div class="sub">Depuis le début</div>
+          </div>
+          <div class="stat red">
+            <div class="label">Utilisateurs</div>
+            <div class="value" id="statUsers">0</div>
+            <div class="sub" id="statUsersSub">Clients / Cuisiniers / Livreurs</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="label">Nouvelles commandes</div>
+            <div class="value" id="statPending">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">En préparation</div>
+            <div class="value" id="statPreparing">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Prêtes</div>
+            <div class="value" id="statReady">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">En livraison</div>
+            <div class="value" id="statDelivering">0</div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top: 30px;">
+          <div style="padding: 20px; border-bottom: 1px solid var(--line);">
+            <h3 style="font-size: 1rem; font-weight: 700;">🕐 Commandes récentes</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Client</th>
+                <th>Source</th>
+                <th>Statut</th>
+                <th>Total</th>
+                <th>Heure</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrders"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ORDERS ═══ -->
+      <div class="view" data-view-content="orders" style="display: none;">
+        <div class="toolbar">
+          <input type="search" id="orderSearch" placeholder="Rechercher (n°, client, téléphone)...">
+          <select id="orderStateFilter">
+            <option value="">Tous les statuts</option>
+            <option value="pending">Nouvelle</option>
+            <option value="preparing">En préparation</option>
+            <option value="ready">Prête</option>
+            <option value="delivering">En livraison</option>
+            <option value="delivered">Livrée</option>
+            <option value="cancelled">Annulée</option>
+          </select>
+          <select id="orderSourceFilter">
+            <option value="">Toutes les sources</option>
+            <option value="website">Site Web</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+          <span class="count" id="ordersCount">0 commandes</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Client</th>
+                <th>Téléphone</th>
+                <th>Source</th>
+                <th>Statut</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ KITCHEN ═══ -->
+      <div class="view" data-view-content="kitchen" style="display: none;">
+        <div class="toolbar">
+          <strong style="font-size: 0.9rem;">Commandes en cours</strong>
+          <span class="count" id="kitchenCount">0 actives</span>
+        </div>
+        <div id="kitchenBoard" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px;"></div>
+      </div>
+
+      <!-- ═══ DRIVERS ═══ -->
+      <div class="view" data-view-content="drivers" style="display: none;">
+        <div class="toolbar">
+          <strong style="font-size: 0.9rem;">Commandes à livrer</strong>
+          <span class="count" id="driversCount">0</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Client</th>
+                <th>Adresse</th>
+                <th>Téléphone</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="driversTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ USERS ═══ -->
+      <div class="view" data-view-content="users" style="display: none;">
+        <div class="toolbar">
+          <input type="search" id="userSearch" placeholder="Rechercher un utilisateur...">
+          <select id="userRoleFilter">
+            <option value="">Tous les rôles</option>
+            <option value="client">Clients</option>
+            <option value="cook">Cuisiniers</option>
+            <option value="driver">Livreurs</option>
+          </select>
+          <span class="count" id="usersCount">0 utilisateurs</span>
+        </div>
+        <div id="usersList"></div>
+      </div>
+
+      <!-- ═══ MESSAGES (WhatsApp manuel) ═══ -->
+      <div class="view" data-view-content="messages" style="display: none;">
+        <div class="wa-card">
+          <h3>💬 Envoyer un message WhatsApp manuel</h3>
+          <label>Numéro (format international, ex : 2250711070001)</label>
+          <input type="tel" id="waTo" placeholder="2250711070001">
+          <label>Message</label>
+          <textarea id="waMessage" placeholder="Bonjour, votre commande est prête !"></textarea>
+          <button class="btn-primary btn" onclick="sendWhatsApp()">📤 Envoyer via Evolution API</button>
+        </div>
+
+        <div class="wa-card">
+          <h3>🔔 Diffuser à tous les clients</h3>
+          <label>Message de diffusion</label>
+          <textarea id="waBroadcast" placeholder="Promo du jour : -20% sur toutes les grillades !"></textarea>
+          <button class="btn-primary btn" onclick="broadcastWhatsApp()">📢 Diffuser à tous les clients</button>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div class="view" data-view-content="settings" style="display: none;">
+        <div class="settings-section">
+          <h3>🔗 Webhooks n8n</h3>
+          <label>URL de base n8n</label>
+          <input id="setN8nBase" placeholder="https://deploy-showoff-engaging.ngrok-free.dev/webhook">
+          <small>Les webhooks seront : /restaurant-order, /kitchen-orders, /kitchen-update, /auth-login</small>
+        </div>
+        <div class="settings-section">
+          <h3>📱 WhatsApp (Evolution API)</h3>
+          <label>URL Evolution API</label>
+          <input id="setEvoUrl" placeholder="http://evolution_api:8080">
+          <label>Clé API</label>
+          <input id="setEvoKey" placeholder="RICHMONDAPI">
+          <label>Instance</label>
+          <input id="setEvoInstance" placeholder="richmond-restaurant">
+          <label>Numéro WhatsApp du restaurant</label>
+          <input id="setWaNumber" placeholder="22584827766">
+        </div>
+        <div class="settings-section">
+          <h3>💰 Configuration livraison</h3>
+          <label>Frais de livraison (FCFA)</label>
+          <input id="setDeliveryFee" type="number" placeholder="1000">
+          <label>Livraison gratuite à partir de (FCFA)</label>
+          <input id="setFreeFrom" type="number" placeholder="10000">
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Enregistrer les paramètres</button>
+        <button class="btn btn-danger" style="margin-left: 10px;" onclick="resetSettings()">🗑 Réinitialiser</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- DETAIL PANEL                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <h2 id="detailTitle">Commande</h2>
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIGURATION
+   ============================================================ */
+const DEFAULT_CONFIG = {
+  n8nBase: 'https://deploy-showoff-engaging.ngrok-free.dev/webhook',
+  evoUrl: 'http://evolution_api:8080',
+  evoKey: 'RICHMONDAPI',
+  evoInstance: 'richmond-restaurant',
+  waNumber: '22584827766',
+  deliveryFee: 1000,
+  freeFrom: 10000
+};
+
+function getConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('richmond_admin_config') || '{}');
+    return { ...DEFAULT_CONFIG, ...saved };
+  } catch { return { ...DEFAULT_CONFIG }; }
+}
+
+function saveConfig(cfg) {
+  localStorage.setItem('richmond_admin_config', JSON.stringify(cfg));
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let currentUser = null;
+let orders = [];
+let users = [];
+let currentView = 'dashboard';
+
+const STATE_LABELS = {
+  pending: 'Nouvelle',
+  preparing: 'En préparation',
+  ready: 'Prête',
+  delivering: 'En livraison',
+  delivered: 'Livrée',
+  cancelled: 'Annulée'
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function escapeHtml(v = '') {
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function formatPrice(v) {
+  return Number(v || 0).toLocaleString('fr-FR') + ' F';
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const date = new Date(d);
+  if (isNaN(date)) return '—';
+  return date.toLocaleString('fr-FR', {
+    day: '2-digit', month: '2-digit', year: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 2800);
+}
+
+async function apiCall(path, payload) {
+  const cfg = getConfig();
+  const url = cfg.n8nBase.replace(/\/$/, '') + '/' + path.replace(/^\//, '');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`HTTP ${res.status} - ${text.slice(0, 200)}`);
+    }
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { return { raw: text }; }
+  } catch (e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout : n8n ne répond pas.');
+    throw e;
+  }
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const msg = document.getElementById('loginMsg');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  btn.disabled = true;
+  btn.textContent = 'Connexion…';
+  msg.className = 'msg';
+
+  try {
+    const result = await apiCall('auth-login', { email, password });
+    if (!result.success || !result.user) {
+      throw new Error(result.error || 'Identifiants invalides.');
+    }
+    // Seuls les cuisiniers (ou managers) peuvent accéder à l'admin
+    const role = result.user.role;
+    if (role !== 'cook' && role !== 'manager' && role !== 'admin') {
+      throw new Error('Accès refusé. Réservé aux administrateurs.');
+    }
+    currentUser = result.user;
+    localStorage.setItem('richmond_admin_session', JSON.stringify(result.user));
+    enterApp();
+  } catch (err) {
+    msg.className = 'msg error';
+    msg.textContent = err.message || 'Erreur de connexion.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
+  }
+});
+
+function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').classList.add('active');
+  document.getElementById('userName').textContent = currentUser.full_name || 'Admin';
+  document.getElementById('userEmail').textContent = currentUser.email || '—';
+  initDate();
+  loadAllData();
+}
+
+function logout() {
+  localStorage.removeItem('richmond_admin_session');
+  location.reload();
+}
+
+function initDate() {
+  const now = new Date();
+  document.getElementById('topbarDate').textContent =
+    now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+const VIEW_TITLES = {
+  dashboard: 'Tableau de bord',
+  orders: 'Commandes',
+  kitchen: 'Cuisine',
+  drivers: 'Livraisons',
+  users: 'Utilisateurs',
+  messages: 'WhatsApp',
+  settings: 'Paramètres'
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => switchView(item.dataset.view));
+});
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach(i =>
+    i.classList.toggle('active', i.dataset.view === view));
+  document.querySelectorAll('[data-view-content]').forEach(el =>
+    el.style.display = el.dataset.viewContent === view ? '' : 'none');
+  document.getElementById('viewTitle').textContent = VIEW_TITLES[view];
+  // Ferme la sidebar sur mobile
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+/* ============================================================
+   DATA LOADING
+   ============================================================ */
+async function loadAllData() {
+  await Promise.all([loadOrders(), loadUsers()]);
+  renderAll();
+}
+
+async function loadOrders() {
+  try {
+    const result = await apiCall('kitchen-orders', { action: 'get_orders' });
+    orders = Array.isArray(result) ? result : (result.orders || result.data || []);
+  } catch (err) {
+    console.error('Erreur chargement commandes:', err);
+    orders = [];
+    showToast('Impossible de charger les commandes : ' + err.message, 'error');
+  }
+}
+
+async function loadUsers() {
+  try {
+    // Utilise un nouveau webhook /admin-users à créer dans n8n
+    const result = await apiCall('admin-users', { action: 'list_users' });
+    users = Array.isArray(result) ? result : (result.users || result.data || []);
+  } catch (err) {
+    console.warn('Webhook admin-users non disponible, utilisation d\'une liste vide.');
+    users = [];
+  }
+}
+
+function refreshAll() {
+  showToast('🔄 Actualisation…');
+  loadAllData().then(() => showToast('✅ Données actualisées', 'success'));
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll() {
+  renderStats();
+  renderRecentOrders();
+  renderOrdersTable();
+  renderKitchenBoard();
+  renderDriversTable();
+  renderUsers();
+  updateBadges();
+}
+
+function updateBadges() {
+  const pending = orders.filter(o => (o.state || o.status) === 'pending' || (o.state || o.status) === 'new').length;
+  const badge = document.getElementById('navOrdersBadge');
+  if (pending > 0) {
+    badge.style.display = '';
+    badge.textContent = pending;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ---------- STATS ---------- */
+function renderStats() {
+  const today = new Date().toDateString();
+  const delivered = orders.filter(o => (o.state || o.status) === 'delivered');
+  const todayDelivered = delivered.filter(o => {
+    const d = new Date(o.create_date || o.order_date || '');
+    return d.toDateString() === today;
+  });
+  const revenue = todayDelivered.reduce((s, o) => s + Number(o.total || 0), 0);
+
+  document.getElementById('statRevenue').textContent = formatPrice(revenue);
+  document.getElementById('statRevenueSub').textContent =
+    `${todayDelivered.length} commande${todayDelivered.length > 1 ? 's' : ''} livrée${todayDelivered.length > 1 ? 's' : ''}`;
+
+  const active = orders.filter(o => ['pending', 'new', 'preparing', 'ready', 'delivering'].includes(o.state || o.status)).length;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statTotal').textContent = orders.length;
+  document.getElementById('statUsers').textContent = users.length;
+
+  const clientCount = users.filter(u => u.x_role === 'client').length;
+  const cookCount = users.filter(u => u.x_role === 'cook').length;
+  const driverCount = users.filter(u => u.x_role === 'driver').length;
+  document.getElementById('statUsersSub').textContent =
+    `${clientCount} clients • ${cookCount} cuisiniers • ${driverCount} livreurs`;
+
+  const byState = (s) => orders.filter(o => (o.state || o.status) === s).length;
+  document.getElementById('statPending').textContent = byState('pending') + byState('new');
+  document.getElementById('statPreparing').textContent = byState('preparing');
+  document.getElementById('statReady').textContent = byState('ready');
+  document.getElementById('statDelivering').textContent = byState('delivering');
+}
+
+/* ---------- RECENT ---------- */
+function renderRecentOrders() {
+  const recent = [...orders].sort((a, b) => {
+    return new Date(b.create_date || b.order_date || 0) - new Date(a.create_date || a.order_date || 0);
+  }).slice(0, 5);
+
+  const tbody = document.getElementById('recentOrders');
+  if (recent.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty"><p>Aucune commande</p></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(o => {
+    const state = o.state || o.status || 'pending';
+    const source = o.source || 'website';
+    return `
+      <tr>
+        <td><strong>${escapeHtml(o.order_number || o.id)}</strong></td>
+        <td>${escapeHtml(o.customer_name || '—')}</td>
+        <td><span class="source-badge source-${source}">${source === 'website' ? '🌐 WEB' : '📱 WA'}</span></td>
+        <td><span class="state-badge state-${state}">${STATE_LABELS[state] || state}</span></td>
+        <td><strong>${formatPrice(o.total)}</strong></td>
+        <td>${formatDate(o.create_date || o.order_date)}</td>
+      </tr>`;
+  }).join('');
+}
+
+/* ---------- ORDERS TABLE ---------- */
+function renderOrdersTable() {
+  const search = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  const stateFilter = document.getElementById('orderStateFilter')?.value || '';
+  const sourceFilter = document.getElementById('orderSourceFilter')?.value || '';
+
+  let filtered = orders.filter(o => {
+    const state = o.state || o.status || 'pending';
+    if (stateFilter && state !== stateFilter) return false;
+    if (sourceFilter && (o.source || 'website') !== sourceFilter) return false;
+    if (search) {
+      const hay = `${o.order_number || ''} ${o.customer_name || ''} ${o.customer_phone || ''}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => new Date(b.create_date || b.order_date || 0) - new Date(a.create_date || a.order_date || 0));
+
+  const tbody = document.getElementById('ordersTable');
+  document.getElementById('ordersCount').textContent = `${filtered.length} commande${filtered.length > 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty"><div class="empty-icon">📋</div><p>Aucune commande</p></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o => {
+    const state = o.state || o.status || 'pending';
+    const source = o.source || 'website';
+    return `
+      <tr>
+        <td><strong>${escapeHtml(o.order_number || o.id)}</strong></td>
+        <td>${escapeHtml(o.customer_name || '—')}</td>
+        <td>${escapeHtml(o.customer_phone || '—')}</td>
+        <td><span class="source-badge source-${source}">${source === 'website' ? '🌐 WEB' : '📱 WA'}</span></td>
+        <td><span class="state-badge state-${state}">${STATE_LABELS[state] || state}</span></td>
+        <td><strong>${formatPrice(o.total)}</strong></td>
+        <td>${formatDate(o.create_date || o.order_date)}</td>
+        <td>
+          <div class="row-actions">
+            <button onclick="openOrderDetail('${escapeHtml(o.order_number || o.id)}')">👁 Détails</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ---------- KITCHEN BOARD ---------- */
+function renderKitchenBoard() {
+  const active = orders.filter(o => {
+    const s = o.state || o.status;
+    return ['pending', 'new', 'preparing', 'ready'].includes(s);
+  });
+  document.getElementById('kitchenCount').textContent = `${active.length} active${active.length > 1 ? 's' : ''}`;
+
+  const board = document.getElementById('kitchenBoard');
+  if (active.length === 0) {
+    board.innerHTML = `<div class="empty" style="grid-column: 1/-1;"><div class="empty-icon">👨‍🍳</div><p>Aucune commande en cours</p></div>`;
+    return;
+  }
+
+  board.innerHTML = active.map(o => {
+    const state = o.state || o.status || 'pending';
+    const items = (o.items || o.line_ids || []).filter(i => i && typeof i === 'object');
+    const itemsHtml = items.length
+      ? items.map(i => `
+          <div class="item-line">
+            <span><span class="qty">${escapeHtml(i.quantity || i.qty || 1)}x</span>${escapeHtml(i.dish_name || i.name || 'Article')}</span>
+          </div>`).join('')
+      : '<div style="color: var(--gray); font-size: 0.82rem;">Articles non détaillés</div>';
+
+    return `
+      <div class="wa-card" style="border-top: 3px solid var(--gold);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0;">#${escapeHtml(o.order_number || o.id)}</h3>
+          <span class="state-badge state-${state}">${STATE_LABELS[state]}</span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--gray); margin-bottom: 10px;">
+          👤 ${escapeHtml(o.customer_name || 'Client')} • 📞 ${escapeHtml(o.customer_phone || '—')}
+        </div>
+        <div style="background: #FAF7F0; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+          ${itemsHtml}
+        </div>
+        <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 12px;">
+          <span>Total</span><span>${formatPrice(o.total)}</span>
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          ${state === 'pending' || state === 'new'
+            ? `<button class="btn btn-primary btn-sm" onclick="updateOrderState('${escapeHtml(o.order_number || o.id)}', 'preparing')">✅ Confirmer</button>`
+            : ''}
+          ${state === 'preparing'
+            ? `<button class="btn btn-primary btn-sm" onclick="updateOrderState('${escapeHtml(o.order_number || o.id)}', 'ready')">✅ Prête</button>`
+            : ''}
+          ${state === 'ready'
+            ? `<button class="btn btn-primary btn-sm" onclick="updateOrderState('${escapeHtml(o.order_number || o.id)}', 'delivering')">🛵 En livraison</button>`
+            : ''}
+          <button class="btn btn-danger btn-sm" onclick="cancelOrder('${escapeHtml(o.order_number || o.id)}')">🗑 Annuler</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ---------- DRIVERS ---------- */
+function renderDriversTable() {
+  const delivering = orders.filter(o => (o.state || o.status) === 'delivering');
+  document.getElementById('driversCount').textContent = `${delivering.length} à livrer`;
+  const tbody = document.getElementById('driversTable');
+
+  if (delivering.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty"><div class="empty-icon">🛵</div><p>Aucune livraison en cours</p></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = delivering.map(o => `
+    <tr>
+      <td><strong>${escapeHtml(o.order_number || o.id)}</strong></td>
+      <td>${escapeHtml(o.customer_name || '—')}</td>
+      <td>${escapeHtml(o.customer_address || '—')}</td>
+      <td>${escapeHtml(o.customer_phone || '—')}</td>
+      <td><strong>${formatPrice(o.total)}</strong></td>
+      <td>
+        <button class="btn btn-primary btn-sm" onclick="updateOrderState('${escapeHtml(o.order_number || o.id)}', 'delivered')">✅ Livrée</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ---------- USERS ---------- */
+function renderUsers() {
+  const search = (document.getElementById('userSearch')?.value || '').toLowerCase();
+  const roleFilter = document.getElementById('userRoleFilter')?.value || '';
+
+  let filtered = users.filter(u => {
+    if (roleFilter && u.x_role !== roleFilter) return false;
+    if (search) {
+      const hay = `${u.name || ''} ${u.email || ''} ${u.phone || ''}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('usersCount').textContent = `${filtered.length} utilisateur${filtered.length > 1 ? 's' : ''}`;
+  const list = document.getElementById('usersList');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><p>Aucun utilisateur</p><p style="margin-top: 8px; font-size: 0.85rem;">Le webhook <code>/admin-users</code> doit être créé dans n8n.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(u => {
+    const role = u.x_role || 'client';
+    const initials = (u.name || u.email || '?').split(' ').map(s => s[0]).slice(0, 2).join('').toUpperCase();
+    return `
+      <div class="user-card">
+        <div class="user-avatar">${escapeHtml(initials)}</div>
+        <div class="user-info">
+          <div class="name">${escapeHtml(u.name || '—')}</div>
+          <div class="meta">📧 ${escapeHtml(u.email || '—')} • 📞 ${escapeHtml(u.phone || '—')}</div>
+        </div>
+        <span class="role-badge role-${role}">${role}</span>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   ORDER DETAIL
+   ============================================================ */
+function openOrderDetail(orderNumber) {
+  const o = orders.find(x => (x.order_number || String(x.id)) === String(orderNumber));
+  if (!o) return;
+  const state = o.state || o.status || 'pending';
+  const source = o.source || 'website';
+  const items = (o.items || o.line_ids || []).filter(i => i && typeof i === 'object');
+
+  document.getElementById('detailTitle').textContent = `Commande #${o.order_number || o.id}`;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-section">
+      <h3>Statut</h3>
+      <span class="state-badge state-${state}" style="font-size: 0.85rem; padding: 8px 14px;">${STATE_LABELS[state]}</span>
+    </div>
+    <div class="detail-section">
+      <h3>Client</h3>
+      <div class="detail-row"><span>Nom</span><span>${escapeHtml(o.customer_name || '—')}</span></div>
+      <div class="detail-row"><span>Téléphone</span><span>${escapeHtml(o.customer_phone || '—')}</span></div>
+      <div class="detail-row"><span>Adresse</span><span>${escapeHtml(o.customer_address || '—')}</span></div>
+      <div class="detail-row"><span>Source</span><span>${source === 'website' ? '🌐 Site Web' : '📱 WhatsApp'}</span></div>
+    </div>
+    <div class="detail-section">
+      <h3>Articles</h3>
+      ${items.length
+        ? items.map(i => `
+            <div class="item-line">
+              <span><span class="qty">${escapeHtml(i.quantity || i.qty || 1)}x</span>${escapeHtml(i.dish_name || i.name || 'Article')}</span>
+              <strong>${formatPrice((i.price || 0) * (i.quantity || i.qty || 1))}</strong>
+            </div>`).join('')
+        : '<p style="color: var(--gray); font-size: 0.85rem;">Articles non détaillés</p>'}
+    </div>
+    <div class="detail-section">
+      <h3>Paiement</h3>
+      <div class="detail-row"><span>Mode</span><span>${escapeHtml((o.payment_method || '—').toUpperCase())}</span></div>
+      <div class="detail-row"><span>Sous-total</span><span>${formatPrice(o.subtotal)}</span></div>
+      <div class="detail-row"><span>Livraison</span><span>${formatPrice(o.delivery_fee)}</span></div>
+      <div class="detail-row" style="font-size: 1rem;"><strong>Total</strong><strong>${formatPrice(o.total)}</strong></div>
+    </div>
+    <div class="detail-section">
+      <h3>Notes</h3>
+      <p style="font-size: 0.88rem; color: var(--gray); line-height: 1.6;">${escapeHtml(o.notes || 'Aucune note')}</p>
+    </div>
+    <div class="detail-section">
+      <h3>Actions</h3>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        ${state !== 'delivered' ? `<button class="btn btn-primary" onclick="updateOrderState('${escapeHtml(o.order_number || o.id)}', 'delivered')">✅ Livrée</button>` : ''}
+        ${state !== 'cancelled' ? `<button class="btn btn-danger" onclick="cancelOrder('${escapeHtml(o.order_number || o.id)}')">🗑 Annuler</button>` : ''}
+        <button class="btn" onclick="sendWhatsAppToOrder('${escapeHtml(o.order_number || o.id)}')">💬 WhatsApp client</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('detailOverlay').classList.add('active');
+  document.getElementById('detailPanel').classList.add('active');
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('active');
+  document.getElementById('detailPanel').classList.remove('active');
+}
+
+/* ============================================================
+   ORDER ACTIONS
+   ============================================================ */
+async function updateOrderState(orderNumber, newState) {
+  try {
+    await apiCall('kitchen-update', { order_number: orderNumber, state: newState });
+    showToast(`✅ Commande #${orderNumber} → ${STATE_LABELS[newState]}`, 'success');
+    await loadOrders();
+    renderAll();
+    closeDetail();
+  } catch (err) {
+    showToast('❌ Erreur : ' + err.message, 'error');
+  }
+}
+
+async function cancelOrder(orderNumber) {
+  if (!confirm(`Annuler la commande #${orderNumber} ?`)) return;
+  await updateOrderState(orderNumber, 'cancelled');
+}
+
+/* ============================================================
+   WHATSAPP MANUAL SEND
+   ============================================================ */
+async function sendWhatsApp() {
+  const cfg = getConfig();
+  const to = document.getElementById('waTo').value.trim();
+  const message = document.getElementById('waMessage').value.trim();
+  if (!to || !message) {
+    showToast('⚠️ Numéro et message requis', 'error');
+    return;
+  }
+  try {
+    const url = `${cfg.evoUrl.replace(/\/$/, '')}/message/sendText/${cfg.evoInstance}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'apikey': cfg.evoKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ number: to, text: message, delay: 1500, linkPreview: false })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    showToast('✅ Message envoyé', 'success');
+    document.getElementById('waMessage').value = '';
+  } catch (err) {
+    showToast('❌ Erreur : ' + err.message, 'error');
+  }
+}
+
+async function broadcastWhatsApp() {
+  const message = document.getElementById('waBroadcast').value.trim();
+  if (!message) {
+    showToast('⚠️ Message requis', 'error');
+    return;
+  }
+  const clients = users.filter(u => u.x_role === 'client' && u.phone);
+  if (clients.length === 0) {
+    showToast('⚠️ Aucun client avec numéro', 'error');
+    return;
+  }
+  if (!confirm(`Envoyer à ${clients.length} clients ?`)) return;
+  showToast(`📢 Envoi à ${clients.length} clients…`);
+  const cfg = getConfig();
+  let success = 0, failed = 0;
+  for (const c of clients) {
+    try {
+      const url = `${cfg.evoUrl.replace(/\/$/, '')}/message/sendText/${cfg.evoInstance}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'apikey': cfg.evoKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: c.phone, text: message, delay: 2000, linkPreview: false })
+      });
+      if (res.ok) success++; else failed++;
+    } catch { failed++; }
+    await new Promise(r => setTimeout(r, 2500)); // Respecter le rate limit WhatsApp
+  }
+  showToast(`✅ ${success} envoyés • ❌ ${failed} échecs`, success > 0 ? 'success' : 'error');
+}
+
+function sendWhatsAppToOrder(orderNumber) {
+  const o = orders.find(x => (x.order_number || String(x.id)) === String(orderNumber));
+  if (!o) return;
+  switchView('messages');
+  document.getElementById('waTo').value = o.customer_phone || '';
+  document.getElementById('waMessage').value =
+    `Bonjour ${o.customer_name || ''}, concernant votre commande #${o.order_number}, `;
+  closeDetail();
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function loadSettingsForm() {
+  const cfg = getConfig();
+  document.getElementById('setN8nBase').value = cfg.n8nBase;
+  document.getElementById('setEvoUrl').value = cfg.evoUrl;
+  document.getElementById('setEvoKey').value = cfg.evoKey;
+  document.getElementById('setEvoInstance').value = cfg.evoInstance;
+  document.getElementById('setWaNumber').value = cfg.waNumber;
+  document.getElementById('setDeliveryFee').value = cfg.deliveryFee;
+  document.getElementById('setFreeFrom').value = cfg.freeFrom;
+}
+
+function saveSettings() {
+  const cfg = {
+    n8nBase: document.getElementById('setN8nBase').value.trim(),
+    evoUrl: document.getElementById('setEvoUrl').value.trim(),
+    evoKey: document.getElementById('setEvoKey').value.trim(),
+    evoInstance: document.getElementById('setEvoInstance').value.trim(),
+    waNumber: document.getElementById('setWaNumber').value.trim(),
+    deliveryFee: parseInt(document.getElementById('setDeliveryFee').value) || 1000,
+    freeFrom: parseInt(document.getElementById('setFreeFrom').value) || 10000
+  };
+  saveConfig(cfg);
+  showToast('✅ Paramètres enregistrés', 'success');
+}
+
+function resetSettings() {
+  if (!confirm('Réinitialiser tous les paramètres ?')) return;
+  localStorage.removeItem('richmond_admin_config');
+  loadSettingsForm();
+  showToast('🗑 Paramètres réinitialisés', 'success');
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier session existante
+  try {
+    const saved = JSON.parse(localStorage.getItem('richmond_admin_session') || 'null');
+    if (saved && saved.id) {
+      currentUser = saved;
+      enterApp();
+    }
+  } catch (e) { /* ignore */ }
+
+  // Filtres
+  document.getElementById('orderSearch')?.addEventListener('input', renderOrdersTable);
+  document.getElementById('orderStateFilter')?.addEventListener('change', renderOrdersTable);
+  document.getElementById('orderSourceFilter')?.addEventListener('change', renderOrdersTable);
+  document.getElementById('userSearch')?.addEventListener('input', renderUsers);
+  document.getElementById('userRoleFilter')?.addEventListener('change', renderUsers);
+
+  // Charger les settings dans le formulaire
+  loadSettingsForm();
+
+  // Auto-refresh toutes les 30s
+  setInterval(() => {
+    if (currentUser) loadOrders().then(renderAll);
+  }, 30000);
+});
+
+/* Raccourcis clavier */
+document.addEventListener('keydown', (e) => {
+  if (!currentUser) return;
+  if (e.key === 'Escape') closeDetail();
+  if (e.ctrlKey && e.key === 'r') { e.preventDefault(); refreshAll(); }
+});
+
+/* Exposer les fonctions appelées depuis le HTML */
+Object.assign(window, {
+  logout, switchView, refreshAll, openOrderDetail, closeDetail,
+  updateOrderState, cancelOrder, sendWhatsApp, broadcastWhatsApp,
+  sendWhatsAppToOrder, saveSettings, resetSettings
+});
+</script>
+
+</body>
+</html>
